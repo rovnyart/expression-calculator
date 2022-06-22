@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-type Data = {
-  result: string
+type Response = {
+  result: number
 };
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse<Response>,
 ) {
-  res.status(200).json({ result: 'John Doe' });
+  res.status(200).json({ result: 0 });
 }
