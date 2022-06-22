@@ -1,3 +1,5 @@
+/* Boilerplate code from https://github.com/mui/material-ui/tree/master/examples/nextjs-with-typescript-v4-migration */
+
 import * as React from 'react';
 import Head from 'next/head';
 import { AppProps } from 'next/app';

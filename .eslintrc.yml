@@ -26,4 +26,7 @@ rules:
   react/function-component-definition: off
   react/react-in-jsx-scope: off
   react/require-default-props: off
+  no-plusplus: off
+  no-continue: off
+  import/prefer-default-export: off
 
