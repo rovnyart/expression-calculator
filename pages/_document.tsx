@@ -2,14 +2,53 @@
 
 import * as React from 'react';
 import Document, {
-  Html, Head, Main, NextScript,
+  Html, Head, Main, NextScript, DocumentContext, DocumentInitialProps,
 } from 'next/document';
 import createEmotionServer from '@emotion/server/create-instance';
 import { ServerStyleSheets as JSSServerStyleSheets } from '@mui/styles';
+
 import theme from '../utils/theme';
 import createEmotionCache from '../utils/createEmotionCache';
 
 export default class MyDocument extends Document {
+  static async getInitialProps(ctx: DocumentContext): Promise<DocumentInitialProps> {
+    const originalRenderPage = ctx.renderPage;
+
+    const cache = createEmotionCache();
+    const { extractCriticalToChunks } = createEmotionServer(cache);
+    const jssSheets = new JSSServerStyleSheets();
+
+    ctx.renderPage = () => originalRenderPage({
+      enhanceApp: (App: any) => function EnhanceApp(props) {
+        return jssSheets.collect(<App emotionCache={cache} {...props} />);
+      },
+    });
+
+    const initialProps = await Document.getInitialProps(ctx);
+
+    const emotionStyles = extractCriticalToChunks(initialProps.html);
+    const emotionStyleTags = emotionStyles.styles.map((style) => (
+      <style
+        data-emotion={`${style.key} ${style.ids.join(' ')}`}
+        key={style.key}
+      // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: style.css }}
+      />
+    ));
+
+    return {
+      ...initialProps,
+      styles: [
+        ...emotionStyleTags,
+        <style
+          id="jss-server-side"
+          key="jss-server-side"
+        />,
+        ...React.Children.toArray(initialProps.styles),
+      ],
+    };
+  }
+
   render() {
     return (
       <Html lang="en">
@@ -32,41 +71,3 @@ export default class MyDocument extends Document {
     );
   }
 }
-
-MyDocument.getInitialProps = async (ctx) => {
-  const originalRenderPage = ctx.renderPage;
-
-  const cache = createEmotionCache();
-  const { extractCriticalToChunks } = createEmotionServer(cache);
-  const jssSheets = new JSSServerStyleSheets();
-
-  ctx.renderPage = () => originalRenderPage({
-    enhanceApp: (App: any) => function EnhanceApp(props) {
-      return jssSheets.collect(<App emotionCache={cache} {...props} />);
-    },
-  });
-
-  const initialProps = await Document.getInitialProps(ctx);
-
-  const emotionStyles = extractCriticalToChunks(initialProps.html);
-  const emotionStyleTags = emotionStyles.styles.map((style) => (
-    <style
-      data-emotion={`${style.key} ${style.ids.join(' ')}`}
-      key={style.key}
-      // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: style.css }}
-    />
-  ));
-
-  return {
-    ...initialProps,
-    styles: [
-      ...emotionStyleTags,
-      <style
-        id="jss-server-side"
-        key="jss-server-side"
-      />,
-      ...React.Children.toArray(initialProps.styles),
-    ],
-  };
-};

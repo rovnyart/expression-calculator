@@ -20,6 +20,9 @@ export enum Errors {
   DIVISION_BY_ZERO = '🦖 Division by zero',
 }
 
+const isNotNumber = (value: string): boolean => Number.isNaN(Number(value));
+const isNumber = (value: string): boolean => !isNotNumber(value);
+
 /* Check for artifacts like "2+--3" etc. Also validate allowed symbols despite we already did
 it on client side - just in case this API goes public =) */
 export const validateExpression = (expression: string): boolean => {
@@ -29,19 +32,19 @@ export const validateExpression = (expression: string): boolean => {
   }
   const first = expression[0];
   /* Check for first char to be number (and "-" in case we want to evaluate negative number) */
-  if (Number.isNaN(Number(first)) && first !== '-') {
+  if (isNotNumber(first) && first !== '-') {
     return false;
   }
 
   for (let i = 0; i < expression.length; i++) {
     const char = expression[i];
     /* Char is number, skipping */
-    if (!Number.isNaN(Number(char))) {
+    if (isNumber(char)) {
       continue;
     }
 
     /* Checking next char, if not number - fail validation */
-    if (Number.isNaN(Number(expression[i + 1]))) {
+    if (isNotNumber(expression[i + 1])) {
       return false;
     }
   }
@@ -52,6 +55,11 @@ export const validateExpression = (expression: string): boolean => {
 export const evaluateExpression = (expression: string): number => {
   if (!expression) return 0;
 
+  if (isNumber(expression)) {
+    /* Return number itself if no operations passed */
+    return Number(expression);
+  }
+
   const stack: number[] = [];
 
   let operator = Operator.PLUS;
@@ -61,7 +69,7 @@ export const evaluateExpression = (expression: string): number => {
     if (current === ' ') continue; // Skipping space. We could filter all spaces before loop, but this is more performant.
 
     /* Accumulating current number till operator met */
-    if (!Number.isNaN(Number(current))) {
+    if (isNumber(current)) {
       num = num * 10 + parseInt(current, 10);
       continue;
     }
@@ -89,11 +97,6 @@ export const evaluateExpression = (expression: string): number => {
     }
     operator = current as Operator;
     num = 0;
-  }
-
-  if (stack.length === 0) {
-    /* Return number itself if no operations passed */
-    return Number(expression);
   }
 
   return stack.reduceRight((a, b) => a + b);

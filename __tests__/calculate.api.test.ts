@@ -44,7 +44,7 @@ describe('/api/calculate', () => {
     expect(res._getJSONData().error).toEqual(Errors.DIVISION_BY_ZERO);
   });
 
-  it('should return with correct result on valid expression', async () => {
+  it('should return 200 with correct result on valid expression', async () => {
     const { req, res } = mockedReqRes();
     req.body = { expression: '8 + 8/1 - 7* 2' };
 
