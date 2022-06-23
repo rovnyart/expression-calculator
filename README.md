@@ -16,7 +16,7 @@ On a client side I chose to use `Material UI`, because I'm really big fan of it 
 
 ## Project structure
 
-  * `__tests` - Unit & integration tests with `jest`
+  * `__tests__` - Unit & integration tests with `jest`
   * `pages/index.ts` - Main (and the only) page
   * `pages/api/calculate.ts` - API endpoint
   * `pages/_app.tsx`, `pages/_document.tsx` - Next.js special files with Material UI boilerplate code, don't bother reading it
