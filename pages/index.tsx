@@ -53,7 +53,7 @@ const Home: NextPage = () => {
         <Grid item>
           <Typography variant="h5">Expression calculator</Typography>
         </Grid>
-        <Grid item sx={{ width: '50%' }}>
+        <Grid item sx={{ width: '30%' }}>
           <TextField
             onChange={handleChange}
             required
