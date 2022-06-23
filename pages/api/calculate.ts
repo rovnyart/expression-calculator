@@ -14,7 +14,7 @@ enum Operator {
   DIVIDE = '/',
 }
 
-enum Errors {
+export enum Errors {
   PAYLOAD = '👮 Payload validation error',
   PARSING = '🤷‍♀️ Error parsing expression',
   DIVISION_BY_ZERO = '🦖 Division by zero',
@@ -22,7 +22,7 @@ enum Errors {
 
 /* Check for artifacts like "2+--3" etc. Also validate allowed symbols despite we already did
 it on client side - just in case this API goes public =) */
-const validateExpression = (expression: string): boolean => {
+export const validateExpression = (expression: string): boolean => {
   /* Check allowed chars */
   if (expression.replace(expressionRegex, '') !== expression) {
     return false;
@@ -49,7 +49,7 @@ const validateExpression = (expression: string): boolean => {
   return true;
 };
 
-const evaluateExpression = (expression: string): number => {
+export const evaluateExpression = (expression: string): number => {
   if (!expression) return 0;
 
   const stack: number[] = [];
@@ -75,7 +75,7 @@ const evaluateExpression = (expression: string): number => {
         stack.push(-num);
         break;
       case Operator.MULTIPLY:
-        stack.push((stack.pop() || 1) * num);
+        stack.push((stack.pop() || 0) * num);
         break;
       case Operator.DIVIDE:
         if (num === 0) {
